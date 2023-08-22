@@ -1,3 +1,6 @@
+> [!WARNING]
+> This fork is not maintained or tested.  I have neither Evernote nor Bear and no time to provide support.
+
 # el2bl
 
 Convert [Evernote](https://evernote.com/) internal relative note links to [Bear](https://bear.app/) note links
