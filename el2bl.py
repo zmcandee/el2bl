@@ -23,6 +23,14 @@ def input_enex_path():
     parser.add_argument(
         "path", type=str, nargs="?", help="file path to directory of evernote files"
     )
+    parser.add_argument(
+        "-d",
+        dest="debug",
+        default=False,
+        const=True,
+        action="store_const",
+        help="Enable more debug output",
+    )
     args = parser.parse_args()
     if args.path:
         path = args.path
@@ -37,7 +45,12 @@ def input_enex_path():
         os.mkdir(f"{path}/bear")
     for file in os.scandir(path):
         if file.is_file() and file.name.endswith(".enex"):
-            convert_links(file)
+            try:
+                convert_links(file)
+            except Exception as e:
+                if args.debug:
+                    raise
+                print(f"An error occured:\n{e}\nPlease try again.")
 
 
 def convert_links(file):
@@ -48,25 +61,22 @@ def convert_links(file):
     - Remove H1 tags from note body
     - Write to a new file in the bear subdirectory
     """
-    try:
-        print(f"Converting {file.name}...")
-        with open(file, "r") as enex:
-            soup = BeautifulSoup(enex, "html.parser")
-            for note in soup.find_all("note"):
-                sub_soup = BeautifulSoup(note.content.string, "html.parser")
-                for link in sub_soup.find_all("a", href=re.compile("evernote://")):
-                    link.string = re.sub(BEAR_LINK_ESCAPE, r"\\\1", link.string)
-                    link.insert_before("[[")
-                    link.insert_after("]]")
-                    link.unwrap()
-                # for heading in soup.find_all('h1'):
-                # heading.name = 'strong'
-                note.content.string = CData(str(sub_soup))
-            with open(f"{os.path.dirname(file)}/bear/{file.name}", "w") as new_enex:
-                new_enex.write(str(soup))
-            print("Done. New file available in the bear subdirectory.")
-    except Exception as e:
-        print(f"An error occurred:\n{e}\nPlease try again.")
+    print(f"Converting {file.name}...")
+    with open(file, "r") as enex:
+        soup = BeautifulSoup(enex, "html.parser")
+        for note in soup.find_all("note"):
+            sub_soup = BeautifulSoup(note.content.string, "html.parser")
+            for link in sub_soup.find_all("a", href=re.compile("evernote://")):
+                link.string = re.sub(BEAR_LINK_ESCAPE, r"\\\1", link.string)
+                link.insert_before("[[")
+                link.insert_after("]]")
+                link.unwrap()
+            # for heading in soup.find_all('h1'):
+            # heading.name = 'strong'
+            note.content.string = CData(str(sub_soup))
+        with open(f"{os.path.dirname(file)}/bear/{file.name}", "w") as new_enex:
+            new_enex.write(str(soup))
+        print("Done. New file available in the bear subdirectory.")
 
 
 if __name__ == "__main__":
