@@ -2,6 +2,7 @@
 """el2bl: convert Evernote note links to Bear note links"""
 import os
 import re
+import argparse
 from bs4 import BeautifulSoup
 
 
@@ -14,7 +15,13 @@ def input_enex_path():
     - Create directory for converted files
     - Run function to convert links in each file
     """
-    path = input("Please input the path to a directory with Evernote exports: ")
+    parser = argparse.ArgumentParser(description="Cleans Evernote enex files to be Bear compatible")
+    parser.add_argument("path", type=str, nargs='?', help="file path to directory of evernote files")
+    args = parser.parse_args()
+    if args.path:
+        path = args.path
+    else:
+        path = input("Please input the path to a directory with Evernote exports: ")
     if not os.path.exists(path):
         print(f"Not a valid file path:\n{path}")
         return
