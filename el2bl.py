@@ -5,6 +5,7 @@ import re
 import argparse
 from bs4 import BeautifulSoup
 
+BEAR_LINK_ESCAPE = r'([\\\[\]|/])'
 
 def input_enex_path():
     """Read .enex files in directory.
@@ -44,12 +45,17 @@ def convert_links(file):
     """
     try:
         print(f"Converting {file.name}...")
-        with open(file) as enex:
-            soup = str(BeautifulSoup(enex, "html.parser"))
-            soup_sub = re.sub(r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', r"[[\2]]", soup)
-            soup_sub = re.sub(r"(<h1.*?>)(.*?)(</h1>?)", r"\2", soup_sub)
-            with open(f"{os.path.dirname(file)}/bear/{file.name}", "x") as new_enex:
-                new_enex.write(soup_sub)
+        with open(file, "r") as enex:
+            soup = BeautifulSoup(enex, "lxml")
+            for link in soup.find_all('a', href=re.compile("evernote://")):
+                link.string = re.sub(BEAR_LINK_ESCAPE, r'\\\1', link.string)
+                link.insert_before('[[')
+                link.insert_after(']]')
+                link.unwrap()
+            for heading in soup.find_all('h1'):
+                heading.name = 'strong'
+            with open(f"{os.path.dirname(file)}/bear/{file.name}", "w") as new_enex:
+                new_enex.write(str(soup))
             print("Done. New file available in the bear subdirectory.")
     except Exception as e:
         print(f"An error occurred:\n{e}\nPlease try again.")
