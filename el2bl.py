@@ -3,9 +3,10 @@
 import os
 import re
 import argparse
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, CData
 
-BEAR_LINK_ESCAPE = r'([\\\[\]|/])'
+BEAR_LINK_ESCAPE = r"([\\\[\]|/])"
+
 
 def input_enex_path():
     """Read .enex files in directory.
@@ -16,8 +17,12 @@ def input_enex_path():
     - Create directory for converted files
     - Run function to convert links in each file
     """
-    parser = argparse.ArgumentParser(description="Cleans Evernote enex files to be Bear compatible")
-    parser.add_argument("path", type=str, nargs='?', help="file path to directory of evernote files")
+    parser = argparse.ArgumentParser(
+        description="Cleans Evernote enex files to be Bear compatible"
+    )
+    parser.add_argument(
+        "path", type=str, nargs="?", help="file path to directory of evernote files"
+    )
     args = parser.parse_args()
     if args.path:
         path = args.path
@@ -46,14 +51,17 @@ def convert_links(file):
     try:
         print(f"Converting {file.name}...")
         with open(file, "r") as enex:
-            soup = BeautifulSoup(enex, "lxml")
-            for link in soup.find_all('a', href=re.compile("evernote://")):
-                link.string = re.sub(BEAR_LINK_ESCAPE, r'\\\1', link.string)
-                link.insert_before('[[')
-                link.insert_after(']]')
-                link.unwrap()
-           # for heading in soup.find_all('h1'):
-           #     heading.name = 'strong'
+            soup = BeautifulSoup(enex, "html.parser")
+            for note in soup.find_all("note"):
+                sub_soup = BeautifulSoup(note.content.string, "html.parser")
+                for link in sub_soup.find_all("a", href=re.compile("evernote://")):
+                    link.string = re.sub(BEAR_LINK_ESCAPE, r"\\\1", link.string)
+                    link.insert_before("[[")
+                    link.insert_after("]]")
+                    link.unwrap()
+                # for heading in soup.find_all('h1'):
+                # heading.name = 'strong'
+                note.content.string = CData(str(sub_soup))
             with open(f"{os.path.dirname(file)}/bear/{file.name}", "w") as new_enex:
                 new_enex.write(str(soup))
             print("Done. New file available in the bear subdirectory.")

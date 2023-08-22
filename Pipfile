@@ -9,10 +9,9 @@ black = "*"
 [packages]
 pre-commit = "*"
 beautifulsoup4 = "*"
-lxml = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "*"
 
 [pipenv]
 allow_prereleases = true
