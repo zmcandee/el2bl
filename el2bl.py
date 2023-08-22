@@ -52,8 +52,8 @@ def convert_links(file):
                 link.insert_before('[[')
                 link.insert_after(']]')
                 link.unwrap()
-            for heading in soup.find_all('h1'):
-                heading.name = 'strong'
+           # for heading in soup.find_all('h1'):
+           #     heading.name = 'strong'
             with open(f"{os.path.dirname(file)}/bear/{file.name}", "w") as new_enex:
                 new_enex.write(str(soup))
             print("Done. New file available in the bear subdirectory.")
