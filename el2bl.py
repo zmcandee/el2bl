@@ -41,9 +41,16 @@ def input_enex_path():
         path = input("Please input the path to a directory with Evernote exports: ")
     if not os.path.exists(path):
         print(f"Not a valid file path:\n{path}")
-        return
+        exit
+    elif os.path.isfile(path):
+        print(f"Not a valid directory path: {path}")
+        exit
+    elif not os.listdir(path):
+        print(f"Directory is empty: {path}")
+        exit
     else:
-        print(f"Valid file path: {path}")
+        print(f"Valid directory path: {path}")
+
     if not os.path.exists(f"{path}/bear"):
         os.mkdir(f"{path}/bear")
     for file in os.scandir(path):
