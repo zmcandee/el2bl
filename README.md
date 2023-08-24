@@ -1,5 +1,5 @@
 > [!WARNING]
-> This fork is not maintained or tested.  I have neither Evernote nor Bear and no time to provide support.
+> This fork is not maintained or tested. I have neither Evernote nor Bear and no time to provide support.
 
 # el2bl
 
@@ -33,19 +33,16 @@ Install [Git](https://git-scm.com), [Python](https://www.python.org/) and [Pipen
 
 ```sh
 ~
-❯ git clone git@github.com:br3ndonland/el2bl.git ~/el2bl
+❯ git clone https://github.com/zmcandee/el2bl.git ~/el2bl
 
 ~
 ❯ cd ~/el2bl
 
 ~/el2bl
-❯ pipenv install --dev
+❯ pipenv install
 
 ~/el2bl
 ❯ pipenv shell
-
-~/el2bl
-el2bl-hash ❯ pre-commit install
 
 ~/el2bl
 el2bl-hash ❯ python el2bl.py
