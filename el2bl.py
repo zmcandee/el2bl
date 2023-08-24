@@ -3,7 +3,10 @@
 import os
 import re
 import argparse
-from bs4 import BeautifulSoup, CData
+import warnings
+from bs4 import BeautifulSoup, CData, XMLParsedAsHTMLWarning
+
+warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 BEAR_LINK_ESCAPE = r"([\\\[\]|/])"
 
