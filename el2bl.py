@@ -76,20 +76,23 @@ def convert_links(file):
         soup = BeautifulSoup(enex, "html.parser")
         for note in soup.find_all("note"):
             print(f"* Note {note.title.string}")
-            sub_soup = BeautifulSoup(note.content.string, "html.parser")
-            for link in sub_soup.find_all("a", href=re.compile("evernote://")):
-                link.string = re.sub(BEAR_LINK_ESCAPE, r"\\\1", link.string)
-                link.insert_before("[[")
-                link.insert_after("]]")
-                print(f"** Link {link.string}")
-                link.unwrap()
-            # for heading in soup.find_all('h1'):
-            # heading.name = 'strong'
-            note.content.string = CData(str(sub_soup))
+            try:
+                sub_soup = BeautifulSoup(note.content.string, "html.parser")
+                for link in sub_soup.find_all("a", href=re.compile("evernote://")):
+                    link.string = re.sub(BEAR_LINK_ESCAPE, r"\\\1", link.string)
+                    link.insert_before("[[")
+                    link.insert_after("]]")
+                    print(f"** Link {link.string}")
+                    link.unwrap()
+                # for heading in soup.find_all('h1'):
+                # heading.name = 'strong'
+                note.content.string = CData(str(sub_soup))
+            except Exception as e:
+                print(f"!!!!  NO SOUP FOR YOU !!!\n\n{e}\n\n")
+                print(note.content)
 
         with open(f"{os.path.dirname(file)}/bear/{file.name}", "w") as new_enex:
             new_enex.write(str(soup))
-        print("Done. New file available in the bear subdirectory.")
 
 
 if __name__ == "__main__":
